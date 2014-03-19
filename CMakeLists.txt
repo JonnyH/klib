@@ -36,3 +36,5 @@ add_library(klib STATIC ${KLIB_SOURCE_FILES} ${KLIB_HEADER_FILES})
 
 install (TARGETS klib DESTINATION lib)
 install (FILES ${KLIB_HEADER_FILES} DESTINATION include/klib)
+
+add_subdirectory(tests)
