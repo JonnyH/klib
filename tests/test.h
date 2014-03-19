@@ -52,9 +52,11 @@ void __run_test(const char *name, void (*fn)(void))
 
 #define xstr(s) str(s)
 #define str(s) #s
+#define __concat_i(x,y) x##y
+#define __concat(x,y) __concat_i(x,y)
 
 #define TEST_FN(x) \
-	static void __attribute__((constructor)) __INIT_##__LINE__(void) {__add_test(xstr(x), x);}
+	static void __attribute__((constructor)) __concat(__TEST_INIT_, __COUNTER__ )(void) {__add_test(xstr(x), x);}
 
 #define TEST_FAIL_IF(x) \
 	if (x) __test_fail(xstr(x), __func__, __LINE__);
