@@ -143,7 +143,7 @@ KLIB_EXPORT void kht_destroy(struct kht_t *table, kht_destroy_function_t destruc
 		struct kslist_t *entry, *tmp, *prev = &table->table[hashValue];
 		kslist_for_each_safe(&table->table[hashValue], entry, tmp)
 		{
-			struct kht_item_t *item = klist_entry(entry, struct kht_item_t, list);
+			struct kht_item_t *item = kslist_entry(entry, struct kht_item_t, list);
 			kslist_del(entry, prev);
 			if (destructor)
 				destructor(item->key, item->data);
@@ -178,7 +178,7 @@ KLIB_EXPORT void* kht_get(struct kht_t *table, void* key)
 	struct kslist_t *entry;
 	kslist_for_each(&table->table[tableOffset], entry)
 	{
-		struct kht_item_t *item = klist_entry(entry, struct kht_item_t, list);
+		struct kht_item_t *item = kslist_entry(entry, struct kht_item_t, list);
 		if (item->hash == hash &&
 		    table->fns.compare_function(key, item->key) == 0)
 		{
@@ -195,7 +195,7 @@ KLIB_EXPORT bool kht_remove(struct kht_t *table, void *key, void **removedKey, v
 	struct kslist_t *entry, *tmp, *prev = &table->table[tableOffset];
 	kslist_for_each_safe(&table->table[tableOffset], entry, tmp)
 	{
-		struct kht_item_t *item = klist_entry(entry, struct kht_item_t, list);
+		struct kht_item_t *item = kslist_entry(entry, struct kht_item_t, list);
 		if (item->hash == hash &&
 		    table->fns.compare_function(key, item->key) == 0)
 		{
@@ -247,7 +247,7 @@ KLIB_EXPORT bool kht_iterator_next(struct kht_iterator_t *it, void **key, void *
 		int listOffset = 0;
 		kslist_for_each(&it->table->table[it->tableOffset], entry)
 		{
-			struct kht_item_t *item = klist_entry(entry, struct kht_item_t, list);
+			struct kht_item_t *item = kslist_entry(entry, struct kht_item_t, list);
 			if (listOffset == it->listOffset)
 			{
 				it->listOffset++;
