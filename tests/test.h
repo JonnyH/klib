@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 static bool globalTestResult = true;
 static bool testStatus = true;
@@ -64,11 +65,35 @@ void __run_test(const char *name, void (*fn)(void))
 
 int main(int argc, char **argv)
 {
-	struct __test_definition *t = __tests;
-	while (t)
+	if (argc > 1)
 	{
-		__run_test(t->name, t->fn);
-		t = t->next;
+		for (int testNr = 1; testNr < argc; testNr++)
+		{
+			struct __test_definition *t = __tests;
+			while (t)
+			{
+				if (strcmp(argv[testNr], t->name) == 0)
+				{
+					__run_test(t->name, t->fn);
+					break;
+				}
+				t = t->next;
+			}
+			if (!t)
+			{
+				printf("TEST %s NOT FOUND\n%s FAILED\n", argv[testNr], argv[testNr]);
+				globalTestResult = false;
+			}
+		}
+	}
+	else
+	{
+		struct __test_definition *t = __tests;
+		while (t)
+		{
+			__run_test(t->name, t->fn);
+			t = t->next;
+		}
 	}
 	if (globalTestResult)
 	{
