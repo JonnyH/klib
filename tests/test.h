@@ -38,6 +38,7 @@ void __run_test(const char *name, void (*fn)(void))
 	testName = name;
 	testStatus = true;
 	printf("%s:\t", name);
+	fflush(stdout);
 	fn();
 	if (testStatus == false)
 	{

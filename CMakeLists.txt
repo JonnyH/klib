@@ -18,7 +18,6 @@ set(CMAKE_MODULE_LINKER_FLAGS "-fvisibility=hidden -pthread ${CMAKE_MODULE_LINKE
 set(KLIB_SOURCE_FILES
 		src/khashtable.c
 		src/kstring.c
-		src/klist.c
 		src/krwlock.c
 				)
 
