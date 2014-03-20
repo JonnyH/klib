@@ -58,6 +58,32 @@ void s_iterate(void)
 }
 TEST_FN(s_iterate);
 
+void s_safeiterate(void)
+{
+	const int count = 100;
+	int i_count = 0;
+	struct kslist_t list_head;
+	struct kslist_t *entry, *tmp;
+	kslist_init_head(&list_head);
+	struct slist_struct *s = malloc(sizeof(struct slist_struct) * count);
+	for (int i = 0; i < count; i++)
+	{
+		kslist_add_tail(&list_head, &s[i].list_member);
+		s[i].magic_before = i;
+		s[i].magic_after = i;
+	}
+	kslist_for_each_safe(&list_head, entry, tmp)
+	{
+		struct slist_struct *e = kslist_entry(entry, struct slist_struct, list_member);
+		TEST_FAIL_IF(e->magic_before != i_count);
+		TEST_FAIL_IF(e->magic_after != i_count);
+		i_count++;
+	}
+	TEST_FAIL_IF(i_count != count);
+	free(s);
+}
+TEST_FN(s_safeiterate);
+
 void s_riterate(void)
 {
 	const int count = 100;
@@ -83,6 +109,32 @@ void s_riterate(void)
 	free(s);
 }
 TEST_FN(s_riterate);
+
+void s_saferiterate(void)
+{
+	const int count = 100;
+	int i_count = 0;
+	struct kslist_t list_head;
+	struct kslist_t *entry, *tmp;
+	kslist_init_head(&list_head);
+	struct slist_struct *s = malloc(sizeof(struct slist_struct) * count);
+	for (int i = 0; i < count; i++)
+	{
+		kslist_add(&list_head, &s[i].list_member);
+		s[i].magic_before = i;
+		s[i].magic_after = i;
+	}
+	kslist_for_each_safe_rev(&list_head, entry, tmp)
+	{
+		struct slist_struct *e = kslist_entry(entry, struct slist_struct, list_member);
+		TEST_FAIL_IF(e->magic_before != i_count);
+		TEST_FAIL_IF(e->magic_after != i_count);
+		i_count++;
+	}
+	TEST_FAIL_IF(i_count != count);
+	free(s);
+}
+TEST_FN(s_saferiterate);
 
 void s_previous(void)
 {

@@ -21,6 +21,9 @@ struct kdlist_t
 #define kdlist_for_each_safe(head, entry, tmp) \
 	for (entry = (head)->next, tmp = entry->next; entry != (head); entry = tmp, tmp = entry->next)
 
+#define kdlist_for_each_safe_rev(head, entry, tmp) \
+	for (entry = (head)->prev, tmp = entry->prev; entry != (head); entry = tmp, tmp = entry->prev)
+
 #define kdlist_entry(ptr, type, member) \
 	kcontainer_of(ptr,type,member)
 
@@ -103,7 +106,7 @@ static inline unsigned int kslist_size(struct kslist_t *head)
 
 
 #define kslist_for_each_safe_rev(head, entry, tmp) \
-	for (entry = __kslist_prev(head, head), tmp = __kslist_prev(entry); entry != head; entry = tmp, tmp = __kslist_prev(entry))
+	for (entry = __kslist_prev(head, head), tmp = __kslist_prev(head, entry); entry != head; entry = tmp, tmp = __kslist_prev(head, entry))
 
 
 
