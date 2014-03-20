@@ -63,8 +63,6 @@ static inline unsigned int kdlist_size(struct kdlist_t *head)
 	return count;
 }
 
-#define KSLIST_EMPTY NULL
-
 struct kslist_t
 {
 	struct kslist_t *next;
@@ -72,14 +70,14 @@ struct kslist_t
 
 static inline bool kslist_empty(struct kslist_t *head)
 {
-	return (head->next == KSLIST_EMPTY);
+	return (head->next == head);
 }
 
 #define kslist_for_each(head, entry) \
-	for (entry = (head)->next; entry != KSLIST_EMPTY; entry = entry->next)
+	for (entry = (head)->next; entry != head; entry = entry->next)
 
 #define kslist_for_each_safe(head, entry, tmp) \
-	for (entry = (head)->next, tmp = (entry == KSLIST_EMPTY ? KSLIST_EMPTY : entry->next); entry != KSLIST_EMPTY; entry = tmp, tmp = entry->next)
+	for (entry = (head)->next, tmp = entry->next; entry != head; entry = tmp, tmp = entry->next)
 static inline struct kslist_t* __kslist_prev(struct kslist_t *head, struct kslist_t *node)
 {
 	struct kslist_t *pos;
@@ -101,11 +99,11 @@ static inline unsigned int kslist_size(struct kslist_t *head)
 }
 
 #define kslist_for_each_rev(head, entry) \
-	for (entry = __kslist_prev(head, KSLIST_EMPTY); entry != head; entry = __kslist_prev(head, entry))
+	for (entry = __kslist_prev(head, head); entry != head; entry = __kslist_prev(head, entry))
 
 
 #define kslist_for_each_safe_rev(head, entry, tmp) \
-	for (entry = __kslist_prev(head, KSLIST_EMPTY), tmp = __kslist_prev(entry); entry != head; entry = tmp, tmp = __kslist_prev(entry))
+	for (entry = __kslist_prev(head, head), tmp = __kslist_prev(entry); entry != head; entry = tmp, tmp = __kslist_prev(entry))
 
 
 
@@ -114,7 +112,7 @@ static inline unsigned int kslist_size(struct kslist_t *head)
 
 static inline void kslist_init_head(struct kslist_t *head)
 {
-	head->next = KSLIST_EMPTY;
+	head->next = head;
 }
 
 static inline void kslist_add(struct kslist_t *head, struct kslist_t *member)
@@ -125,13 +123,13 @@ static inline void kslist_add(struct kslist_t *head, struct kslist_t *member)
 
 static inline void kslist_del(struct kslist_t *head, struct kslist_t *member)
 {
-	struct kslist_t *prev = __kslist_prev(head, KSLIST_EMPTY);
+	struct kslist_t *prev = __kslist_prev(head, head);
 	prev->next = member->next;
 }
 
 static inline void kslist_add_tail(struct kslist_t *head, struct kslist_t *member)
 {
-	kslist_add(__kslist_prev(head, KSLIST_EMPTY), member);
+	kslist_add(__kslist_prev(head, head), member);
 }
 
 #endif /* __KLIST_H */

@@ -88,10 +88,10 @@ void s_previous(void)
 {
 	struct kslist_t list_head;
 	kslist_init_head(&list_head);
-	TEST_FAIL_IF(__kslist_prev(&list_head, KSLIST_EMPTY) != &list_head);
+	TEST_FAIL_IF(__kslist_prev(&list_head, &list_head) != &list_head);
 	struct kslist_t m1;
 	kslist_add(&list_head, &m1);
 	TEST_FAIL_IF(__kslist_prev(&list_head, &m1) != &list_head);
-	TEST_FAIL_IF(__kslist_prev(&list_head, KSLIST_EMPTY) != &m1);
+	TEST_FAIL_IF(__kslist_prev(&list_head, &list_head) != &m1);
 }
 TEST_FN(s_previous);
