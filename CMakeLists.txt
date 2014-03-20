@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(klib)
+enable_testing()
 
 option (OLTO "Enable Link Time Optimisations (LTO)" OFF)
 option (ONATIVE "Optimise for the host CPU" OFF)
