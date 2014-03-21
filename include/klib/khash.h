@@ -2,11 +2,12 @@
 #define __KHASH_H
 
 #include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
 
 #define KHT_DEFINE_HASH_FN(name, size_expr) \
-inline uint32_t name (void *ptr) {uint32_t hash = 0; kht_murmur_hash(ptr, size_expr, 0, &hash); return hash;}
+inline uint32_t name (void *ptr) {return kht_murmur_hash(ptr, size_expr, 0);}
+
+#define KHT_DEFINE_SIMPLE_HASH_FN(name, size_expr) \
+inline uint32_t name (void *ptr) {return kht_simple_hash(ptr, size_expr, 0);}
 
 #define __ROTL32(num,amount) (((num) << (amount)) | ((num) >> (32 - (amount))))
 
@@ -21,7 +22,7 @@ static inline uint32_t __murmur_fmix ( uint32_t h )
         return h;
 }
 
-static inline void kht_murmur_hash(const void *key, uint32_t length, uint32_t seed, uint32_t *out)
+static inline uint32_t kht_murmur_hash(const void *key, uint32_t length, uint32_t seed)
 {
         const uint8_t * data = (const uint8_t*)key;
         const int nblocks = length / 4;
@@ -77,7 +78,49 @@ static inline void kht_murmur_hash(const void *key, uint32_t length, uint32_t se
 
         h1 = __murmur_fmix(h1);
 
-        *out = h1;
+        return h1;
+}
+
+static inline uint32_t __simple_mix(uint32_t h1, uint32_t k1)
+{
+	/* Constant from murmur3 */
+	const uint32_t c1 = 0xcc9e2d51;
+
+	h1 ^= c1;
+	h1 += k1;
+	h1 = __ROTL32(h1, 11);
+	h1 ^= k1;
+	h1 = __ROTL32(h1, 17);
+
+	return h1;
+}
+
+static inline uint32_t kht_simple_hash(const void *key, uint32_t length, uint32_t seed)
+{
+	uint32_t h = seed;
+	const uint32_t *ptr = key;
+	unsigned int blocks = length / 4;
+	uint32_t k = 0;
+	while (--blocks)
+	{
+		h = __simple_mix(h, *(ptr++));
+	}
+
+	const uint8_t *tail = (const uint8_t*)(key + blocks * 4);
+	switch (length%3)
+	{
+		case 3:
+			k ^= tail[2] << 16;
+		case 2:
+			k ^= tail[1] << 8;
+		case 1:
+			k ^= tail[0];
+			h = __simple_mix(h,k);
+		case 0:
+			break;
+			/* no action */
+	}
+	return h;
 }
 
 #endif //__KHASHTABLE_H
