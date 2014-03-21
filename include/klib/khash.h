@@ -4,10 +4,10 @@
 #include <stdint.h>
 
 #define KHT_DEFINE_HASH_FN(name, size_expr) \
-inline uint32_t name (void *ptr) {return kht_murmur_hash(ptr, size_expr, 0);}
+inline uint32_t name (const void *ptr) {return kht_murmur_hash(ptr, size_expr, 0);}
 
 #define KHT_DEFINE_SIMPLE_HASH_FN(name, size_expr) \
-inline uint32_t name (void *ptr) {return kht_simple_hash(ptr, size_expr, 0);}
+inline uint32_t name (const void *ptr) {return kht_simple_hash(ptr, size_expr, 0);}
 
 #define __ROTL32(num,amount) (((num) << (amount)) | ((num) >> (32 - (amount))))
 
