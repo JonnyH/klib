@@ -1,27 +1,57 @@
 #ifndef __KSTRING_H
 #define __KSTRING_H
 
-#include "khashtable.h"
-
 #include <stddef.h>
+#include <stdint.h>
 
-struct kstring_t;
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdio.h>
 
-struct kstring_t *kstr_create(size_t initialSize);
-void kstr_destroy(struct kstring_t *str);
-char* kstr_cstr(const struct kstring_t *str);
-/* Appends the printf-stype format/args to 'str' */
-void kstr_printf(struct kstring_t *str, const char* format, ...)
-	__attribute__ ((format (printf, 2, 3)));
-size_t kstr_length(const struct kstring_t *str);
-
-uint32_t kstr_hash(const struct kstring_t *str);
-int kstr_cmp(const struct kstring_t *strA, const struct kstring_t *strB);
-
-static const struct kht_functions_t kstr_hash_functions =
+struct kstring
 {
-	.hash_function = (kht_hash_function_t)kstr_hash,
-	.compare_function = (kht_compare_function_t)kstr_cmp,
+	uint32_t allocated_size;
+	uint32_t used_size;
+	uint8_t *cstr;
 };
+
+static inline void kstring_init(struct kstring *str)
+{
+	str->allocated_size = 0;
+	str->used_size = 0;
+	str->cstr = NULL;
+}
+
+static inline void kstr_destroy(struct kstring *str)
+{
+	free(str->cstr);
+	kstring_init(str);
+}
+
+__attribute__ ((format (printf, 2, 3)))
+static inline void kstr_printf(struct kstring *str, const char* format, ...)
+{
+        va_list argList;
+        int sizeLeft, sizeWritten;
+
+        sizeLeft = str->allocated_size - str->used_size;
+
+        va_start(argList, format);
+
+        sizeWritten = vsnprintf(str->cstr + str->used_size, sizeLeft, format, argList);
+
+        va_end(argList);
+        while (sizeWritten >= sizeLeft)
+        {
+                str->allocated_size *= 2;
+                str->cstr = realloc(str->cstr, str->allocated_size);
+                sizeLeft = str->allocated_size - str->used_size;
+                va_start(argList, format);
+                sizeWritten = vsnprintf(str->cstr + str->used_size, sizeLeft, format, argList);
+                va_end(argList);
+        }
+
+        str->used_size += sizeWritten;
+}
 
 #endif
