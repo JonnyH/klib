@@ -123,4 +123,45 @@ static inline uint32_t kht_simple_hash(const void *key, uint32_t length, uint32_
 	return h;
 }
 
+static inline uint32_t __rev_mix(uint32_t data, uint32_t counter)
+{
+	return __simple_mix(data, counter);
+}
+
+static inline uint32_t krhash(const void *key, uint32_t length, uint32_t seed)
+{
+	uint32_t h = seed;
+	const uint32_t *ptr = key;
+	unsigned int blocks = length / 4;
+	uint32_t k = 0, count = 0;
+	while (count < blocks)
+	{
+		h ^= __rev_mix(*(ptr++), count);
+		count++;
+	}
+	const uint8_t *tail = (const uint8_t*)(key + blocks * 4);
+	switch (length%3)
+	{
+		case 3:
+			k ^= tail[2] << 16;
+		case 2:
+			k ^= tail[1] << 8;
+		case 1:
+			k ^= tail[0];
+			h ^= __rev_mix(k,count);
+		case 0:
+			break;
+			/* no action */
+	}
+	return h;
+}
+
+static inline uint32_t krhash_mod(uint32_t hash, uint32_t prevValue, uint32_t newValue, uint32_t counter)
+{
+	hash ^= __rev_mix(prevValue, counter);
+	hash ^= __rev_mix(newValue, counter);
+	return hash;
+}
+
+
 #endif //__KHASHTABLE_H

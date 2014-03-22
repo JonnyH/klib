@@ -44,3 +44,32 @@ void t_string(void)
 	TEST_FAIL_IF(fn1(string) != fn2(string));
 }
 TEST_FN(t_string);
+
+struct rhash_test_data
+{
+	uint32_t data[3];
+};
+void t_rhash(void)
+{
+	struct rhash_test_data d1, d2;
+	uint32_t h1, h2;
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			d1.data[j] = rand();
+			d2.data[j] = rand();
+		}
+		h1 = krhash(&d1, sizeof(d1), 0);
+		h2 = krhash(&d2, sizeof(d2), 0);
+		for (int j = 0; j < 3; j++)
+		{
+			h2 = krhash_mod(h2, d2.data[j], d1.data[j], j);
+			d2.data[j] = d1.data[j];
+		}
+		TEST_FAIL_IF(h1 != h2);
+		TEST_FAIL_IF(h1 != krhash(&d1, sizeof(d1), 0));
+		TEST_FAIL_IF(h2 != krhash(&d2, sizeof(d2), 0));
+	}
+}
+TEST_FN(t_rhash);
