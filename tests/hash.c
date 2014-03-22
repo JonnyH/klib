@@ -71,5 +71,23 @@ void t_rhash(void)
 		TEST_FAIL_IF(h1 != krhash(&d1, sizeof(d1), 0));
 		TEST_FAIL_IF(h2 != krhash(&d2, sizeof(d2), 0));
 	}
+	for (int i = 2; i >= 0; i--)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			d1.data[j] = i;
+			d2.data[j] = j;
+		}
+		h1 = krhash(&d1, sizeof(d1), 0);
+		h2 = krhash(&d2, sizeof(d2), 0);
+		for (int j = 0; j < 3; j++)
+		{
+			h2 = krhash_mod(h2, d2.data[j], d1.data[j], j);
+			d2.data[j] = d1.data[j];
+		}
+		TEST_FAIL_IF(h1 != h2);
+		TEST_FAIL_IF(h1 != krhash(&d1, sizeof(d1), 0));
+		TEST_FAIL_IF(h2 != krhash(&d2, sizeof(d2), 0));
+	}
 }
 TEST_FN(t_rhash);
