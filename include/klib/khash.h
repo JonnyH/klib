@@ -125,7 +125,8 @@ static inline uint32_t kht_simple_hash(const void *key, uint32_t length, uint32_
 
 static inline uint32_t __rev_mix(uint32_t data, uint32_t counter)
 {
-	return __simple_mix(data, counter);
+	return __murmur_fmix(data) *  7 + __murmur_fmix(counter);
+	//return __simple_mix(counter, data);
 }
 
 static inline uint32_t krhash(const void *key, uint32_t length, uint32_t seed)
